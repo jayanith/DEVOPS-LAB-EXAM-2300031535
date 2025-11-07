@@ -3,15 +3,15 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-COPY mvnw .          
-COPY .mvn/ .mvn
+# Install Maven directly (since mvnw and .mvn folder might be missing)
+RUN apt-get update && apt-get install -y maven
 
-RUN chmod +x mvnw
-
+# Copy only what’s needed for the build
 COPY pom.xml ./
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+# Build the app, skipping tests for faster build
+RUN mvn clean package -DskipTests
 
 # Stage 2: Run the app
 FROM eclipse-temurin:21-jdk
